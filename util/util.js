@@ -4,9 +4,18 @@ var Binary = require('binary');
 var Put = require('bufferput');
 var buffertools = require('buffertools');
 var sjcl = require('../lib/sjcl');
+try {
+  var x11 = require('x11-hash');
+} catch(e) {
+  var x11 = null;
+}
 if (process.browser) {
   var hashjs = require('hash.js');
 }
+
+var x11Digest = exports.x11Digest = function(data) {
+  return x11.digest(data);
+};
 
 var sha256 = exports.sha256 = function(data) {
   return new Buffer(crypto.createHash('sha256').update(data).digest('binary'), 'binary');
