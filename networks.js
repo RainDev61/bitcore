@@ -4,8 +4,8 @@ var hex = function(hex) {
   return new Buffer(hex, 'hex');
 };
 
-exports.startcoin = {
-  name: 'startcoin',
+exports.livenet = {
+  name: 'livenet',
   magic: hex('ffc4badf'),
   addressVersion: 0x7d, // Starts with s
   privKeyVersion: 0xfd,
@@ -29,8 +29,8 @@ exports.startcoin = {
   defaultClientPort: 9247
 };
 
-exports.livenet = exports.startcoin;
-exports.mainnet = exports.startcoin;
+exports.startcoin = exports.livenet;
+exports.mainnet = exports.livenet;
 
 exports.testnet = {
   name: 'testnet',
