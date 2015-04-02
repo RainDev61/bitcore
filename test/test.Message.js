@@ -66,8 +66,8 @@ describe('Message', function() {
   });
 
   describe('magicBytes', function() {
-    it('should be "Bitcoin Signed Message:\\n"', function() {
-      Message.magicBytes.toString().should.equal('Bitcoin Signed Message:\n');
+    it('should be "StartCOIN Signed Message:\\n"', function() {
+      Message.magicBytes.toString().should.equal('StartCOIN Signed Message:\n');
     });
   });
 
