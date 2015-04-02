@@ -31,3 +31,26 @@ exports.startcoin = {
 
 exports.livenet = exports.startcoin;
 exports.mainnet = exports.startcoin;
+
+exports.testnet = {
+  name: 'testnet',
+  magic: hex('ffc4b9de'),
+  addressVersion: 0x7f, // Starts with t
+  privKeyVersion: 0xf4,
+  P2SHVersion: 0xc4,
+  hkeyPublicVersion: 0x043587cf,
+  hkeyPrivateVersion: 0x04358394,
+  blockHashFunc: 'x11',
+  genesisBlock: {
+    hash: hex('1c5b057254a13f6e5df49cd1e17e0bddc27e5655a4fdf00150c7f4d844030000'),
+    merkle_root: hex('879a5f109e85a1dce436c1dc18803ff2a60bf8ec5acc631d4ba41a391f8a82b7'),
+    height: 0,
+    nonce: 1020189,
+    version: 1,
+    prev_hash: buffertools.fill(new Buffer(32), 0),
+    timestamp: 1404645149,
+    bits: 0x1e0fffff
+  },
+  dnsSeeds: [],
+  defaultClientPort: 19247
+};
