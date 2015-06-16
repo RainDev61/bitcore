@@ -11,8 +11,6 @@ var Opcode = bitcore.Opcode;
 var PublicKey = bitcore.PublicKey;
 var Address = bitcore.Address;
 
-var script_valid = require('../data/bitcoind/script_valid');
-
 describe('Script', function() {
 
   it('should make a new script', function() {
@@ -251,6 +249,10 @@ describe('Script', function() {
       Script('73 0x3046022100bb3c194a30e460d81d34be0a230179c043a656f67e3c5c8bf47eceae7c4042ee0221008bf54ca11b2985285be0fd7a212873d243e6e73f5fad57e8eb14c4f39728b8c601 65 0x04e365859b3c78a8b7c202412b949ebca58e147dba297be29eee53cd3e1d300a6419bc780cc9aec0dc94ed194e91c8f6433f1b781ee00eac0ead2aae1e8e0712c6 OP_CHECKSIG').isPublicKeyHashIn().should.equal(false);
     });
 
+    it('should identify this known pubkey', function() {
+      Script('70 0x3043021f336721e4343f67c835cbfd465477db09073dc38a936f9c445d573c1c8a7fdf022064b0e3cb6892a9ecf870030e3066bc259e1f24841c9471d97f9be08b73f6530701 33 0x0370b2e1dcaa8f51cb0ead1221dd8cb31721502b3b5b7d4b374d263dfec63a4369').isPublicKeyHashIn().should.equal(true);
+    });
+
   });
 
   describe('#isPublicKeyHashOut', function() {
@@ -324,15 +326,24 @@ describe('Script', function() {
       s.isScriptHashIn().should.equal(false);
       s2.isScriptHashIn().should.equal(false);
     });
+    it('identifies this other problematic non-p2sh in', function() {
+      var s = Script.fromString('73 0x3046022100dc7a0a812de14acc479d98ae209402cc9b5e0692bc74b9fe0a2f083e2f9964b002210087caf04a711bebe5339fd7554c4f7940dc37be216a3ae082424a5e164faf549401');
+      s.isScriptHashIn().should.equal(false);
+    });
   });
 
   describe('#isScripthashOut', function() {
 
-    it('should identify this known pubkeyhashout as pubkeyhashout', function() {
+    it('should identify this known p2shout as p2shout', function() {
       Script('OP_HASH160 20 0x0000000000000000000000000000000000000000 OP_EQUAL').isScriptHashOut().should.equal(true);
     });
 
-    it('should identify these known non-pubkeyhashout as not pubkeyhashout', function() {
+    it('should identify result of .isScriptHashOut() as p2sh', function() {
+      Script('OP_DUP OP_HASH160 20 0x0000000000000000000000000000000000000000 OP_EQUALVERIFY OP_CHECKSIG')
+      .toScriptHashOut().isScriptHashOut().should.equal(true);
+    });
+
+    it('should identify these known non-p2shout as not p2shout', function() {
       Script('OP_HASH160 20 0x0000000000000000000000000000000000000000 OP_EQUAL OP_EQUAL').isScriptHashOut().should.equal(false);
       Script('OP_HASH160 21 0x000000000000000000000000000000000000000000 OP_EQUAL').isScriptHashOut().should.equal(false);
     });
@@ -429,6 +440,24 @@ describe('Script', function() {
 
     it('should work for no data OP_RETURN', function() {
       Script().add(Opcode.OP_RETURN).add(new Buffer('')).toString().should.equal('OP_RETURN 0');
+    });
+    it('works with objects', function() {
+      Script().add({
+        opcodenum: 106
+      }).toString().should.equal('OP_RETURN');
+    });
+    it('works with another script', function() {
+      var someScript = Script('OP_2 21 0x038282263212c609d9ea2a6e3e172de238d8c39cabd5ac1ca10646e23fd5f51508 ' +
+        '21 0x038282263212c609d9ea2a6e3e172de238d8c39cabd5ac1ca10646e23fd5f51508 OP_2 OP_CHECKMULTISIG');
+      var s = new Script().add(someScript);
+      s.toString()
+        .should.equal(someScript.toString());
+    });
+    it('fails with wrong type', function() {
+      var fails = function() {
+        return new Script().add(true);
+      };
+      fails.should.throw('Invalid script chunk');
     });
   });
 
@@ -629,6 +658,15 @@ describe('Script', function() {
   });
 
   describe('getData returns associated data', function() {
+    it('works with this testnet transaction', function() {
+      // testnet block: 00000000a36400fc06440512354515964bc36ecb0020bd0b0fd48ae201965f54
+      // txhash: e362e21ff1d2ef78379d401d89b42ce3e0ce3e245f74b1f4cb624a8baa5d53ad (output 0);
+      var script = Script.fromBuffer(new Buffer('6a', 'hex'));
+      var dataout = script.isDataOut();
+      dataout.should.equal(true);
+      var data = script.getData();
+      data.should.deep.equal(new Buffer(0));
+    });
     it('for a P2PKH address', function() {
       var address = Address.fromString('1NaTVwXDDUJaXDQajoa9MqHhz4uTxtgK14');
       var script = Script.buildPublicKeyHashOut(address);
@@ -736,5 +774,6 @@ describe('Script', function() {
       Script().add(new Buffer('a')).equals(Script().add(new Buffer('b'))).should.equal(false);
     });
   });
+
 
 });
