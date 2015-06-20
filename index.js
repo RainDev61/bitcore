@@ -9,7 +9,7 @@ bitcore.versionGuard = function(version) {
     var message = 'More than one instance of bitcore found with versions: ' + bitcore.version +
       ' and ' + version + '. Please make sure to require bitcore and check that submodules do' +
       ' not also include their own bitcore dependency.';
-    throw new Error(message);
+    //throw new Error(message);
   }
 };
 bitcore.versionGuard(global._bitcore);
