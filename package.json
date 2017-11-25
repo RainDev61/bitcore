@@ -73,7 +73,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/startcoin-project/bitcore.git"
+    "url": "git://github.com/RainDev61/bitcore.git"
   },
   "browser": {
     "request": "browser-request"
